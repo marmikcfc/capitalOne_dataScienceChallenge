@@ -34,10 +34,10 @@ from sklearn.metrics import (accuracy_score,
 
 # convert to CSV
 
-# txt_file_train = r"codetest_train.txt"
-# csv_file_train = r"codetest_train.csv"
-# txt_file_test = r"codetest_test.txt"
-# csv_file_test = r"codetest_test.csv"
+txt_file_train = r"codetest_train.txt"
+csv_file_train = r"codetest_train.csv"
+txt_file_test = r"codetest_test.txt"
+csv_file_test = r"codetest_test.csv"
 
 # use 'with' if the program isn't going to immediately terminate
 # so you don't leave files open
@@ -47,13 +47,13 @@ from sklearn.metrics import (accuracy_score,
 # On other platforms, it has no effect
 
 
-# in_txt = csv.reader(open(txt_file_test, "r"), delimiter = '\t')
-# out_csv = csv.writer(open(csv_file_test, 'w'))
-# out_csv.writerows(in_txt)
+in_txt = csv.reader(open(txt_file_test, "r"), delimiter = '\t')
+out_csv = csv.writer(open(csv_file_test, 'w',newline=''))
+out_csv.writerows(in_txt)
 
-# in_txt = csv.reader(open(txt_file_train, "r"), delimiter = '\t')
-# out_csv = csv.writer(open(csv_file_train, 'w'))
-# out_csv.writerows(in_txt)
+in_txt = csv.reader(open(txt_file_train, "r"), delimiter = '\t')
+out_csv = csv.writer(open(csv_file_train, 'w',newline=''))
+out_csv.writerows(in_txt)
 
 
 #Now let the magic begin
@@ -84,7 +84,7 @@ num_cat_cols = num_cols+cat_cols # Combined numerical and Categorical variables
 
 for var in num_cat_cols:
     if fullData[var].isnull().any()==True:
-        fullData[var+'####']=fullData[var].isnull()*1 
+        fullData[var]=fullData[var].isnull()*1 
 
 
 #Impute numerical missing values with mean
@@ -102,15 +102,18 @@ for var in cat_cols:
  fullData[var] = number.fit_transform(fullData[var].astype('str'))
 
 #Target variable is also a categorical so convert it
-fullData["target"] = number.fit_transform(fullData["target"].astype('float'))
+#fullData["target"] = number.fit_transform(fullData["target"].astype('float'))
 
+print("___________________________Full Data__________________________")
+print(fullData['target'])
 
 train=fullData[fullData['Type']=='Train']
 test=fullData[fullData['Type']=='Test']
 
-train['is_train'] = np.random.uniform(0, 1, len(train)) <= .75
-Train, Validate = train[train['is_train']==True], train[train['is_train']==False]
+#train['is_train'] = np.random.uniform(0, 1, len(train)) <= 1.5
+#Train, Validate = train[train['is_train']==True], train[train['is_train']==False]
 
+Train = train 
 #pass the imputed dummy variable into modelling process
 
 print("pass the imputed dummy variable into modelling process")
@@ -130,8 +133,8 @@ y_train = Train["target"].values
 print("####################################y_train##################################")
 
 print(y_train)
-x_validate = Validate[list(features)].values
-y_validate = Validate["target"].values
+#x_validate = Validate[list(features)].values
+#y_validate = Validate["target"].values
 x_test=test[list(features)].values
 
 print("starting random seeeeeed")
@@ -140,18 +143,16 @@ random.seed(100)
 
 print("Seeding Done")
 
-rf = RandomForestClassifier(n_estimators=10,max_depth=3, n_jobs = -3)
+rf = RandomForestClassifier(n_estimators=10, n_jobs = -1)
 
 print("Random Forest Function Call done")
 
 
-rf.fit(x_train, y_train)
+rf.fit(x_train, y_train.astype('str'))
 
 print("Random Seeding fitting done")
 
-status = rf.predict_proba(x_validate)
-
-print("Status",status)
+#status = rf.predict_proba(x_validate)
 
 # fpr, tpr, _ = roc_curve(y_validate, status[:,1])
 
@@ -161,8 +162,11 @@ print("Status",status)
 # print ("post AUC")
 # print (roc_auc)
 
-final_status = rf.predict_proba(x_test)
-test["target"]=final_status[:,1]
+final_status = rf.predict(x_test)
+
+print(final_status)
+test["target"]=final_status
+print("Final STATUS")
 test.to_csv('model_output.csv',columns=['target'])
 
 
