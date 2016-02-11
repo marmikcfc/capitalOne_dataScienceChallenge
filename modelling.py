@@ -1,3 +1,7 @@
+# Since this was my first experience with data science and data modelling as such 
+# refered to a lot of StackOverflow examples 
+# a few tutorials on the web
+
 import csv
 import pandas as pd
 import numpy as np
@@ -5,33 +9,8 @@ from sklearn.preprocessing import LabelEncoder
 import random
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import (accuracy_score,
-                             average_precision_score,
-                             auc,
-                             classification_report,
-                             confusion_matrix,
-                             explained_variance_score,
-                             f1_score,
-                             fbeta_score,
-                             hamming_loss,
-                             hinge_loss,
-                             jaccard_similarity_score,
-                             log_loss,
-                             matthews_corrcoef,
-                             mean_squared_error,
-                             mean_absolute_error,
-                             precision_recall_curve,
-                             precision_recall_fscore_support,
-                             precision_score,
-                             recall_score,
-                             r2_score,
-                             roc_auc_score,
-                             roc_curve,
-                             zero_one_loss)
-
-
-
-
+from sklearn.metrics import mean_squared_error
+                             
 # convert to CSV
 
 txt_file_train = r"codetest_train.txt"
@@ -91,7 +70,7 @@ fullData[num_cols] = fullData[num_cols].fillna(fullData[num_cols].mean(),inplace
 #Impute categorical missing values with -9999
 fullData[cat_cols] = fullData[cat_cols].fillna(value = -9999)
 
-print("After Entering values")
+#print("After Entering values")
 print(fullData.describe())
 
 #create label encoders for categorical features
@@ -100,10 +79,6 @@ for var in cat_cols:
  fullData[var] = number.fit_transform(fullData[var].astype('str'))
 
 #Target variable is also a categorical so convert it
-#fullData["target"] = number.fit_transform(fullData["target"].astype('float'))
-
-print("___________________________Full Data__________________________")
-print(fullData['target'])
 
 Train=fullData[fullData['Type']=='Train']
 test=fullData[fullData['Type']=='Test']
@@ -111,46 +86,28 @@ test=fullData[fullData['Type']=='Test']
 
 #pass the imputed dummy variable into modelling process
 
-print("pass the imputed dummy variable into modelling process")
+#print("pass the imputed dummy variable into modelling process")
 
 features=list(set(list(fullData.columns))-set(target_col)-set(other_col))
 
-print("xtrain and shit")
-
 x_train = Train[list(features)].values
-
-print("####################################X_train##################################")
-
-print(x_train)
-
+#print("####################################X_train##################################")
+#print(x_train)
 y_train = Train["target"].values
 
-print("####################################y_train##################################")
-
-print(y_train)
-
+#print("####################################y_train##################################")
+#print(y_train)
 x_test=test[list(features)].values
 
-print("starting random seeeeeed")
+#print("starting random seeeeeed")
 
 random.seed(100)
-
-print("Seeding Done")
-
 rf = RandomForestClassifier(n_estimators=10, n_jobs = -1)
-
-print("Random Forest Function Call done")
-
-
 rf.fit(x_train, y_train.astype('str'))
-
-print("Random Seeding fitting done")
-
 final_status = rf.predict(x_test)
-
-print(final_status)
 test["target"]=final_status
-print("Final STATUS")
+
+#print("Final STATUS", final_status)
 test.to_csv('model_output.csv',columns=['target'])
 
 
