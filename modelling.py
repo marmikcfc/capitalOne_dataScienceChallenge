@@ -58,8 +58,6 @@ out_csv.writerows(in_txt)
 
 #Now let the magic begin
 
-
-
 train=pd.read_csv('codetest_train.csv')
 test=pd.read_csv('codetest_test.csv')
 train['Type']='Train' #Create a flag for Train and Test Data set
@@ -107,13 +105,10 @@ for var in cat_cols:
 print("___________________________Full Data__________________________")
 print(fullData['target'])
 
-train=fullData[fullData['Type']=='Train']
+Train=fullData[fullData['Type']=='Train']
 test=fullData[fullData['Type']=='Test']
 
-#train['is_train'] = np.random.uniform(0, 1, len(train)) <= 1.5
-#Train, Validate = train[train['is_train']==True], train[train['is_train']==False]
 
-Train = train 
 #pass the imputed dummy variable into modelling process
 
 print("pass the imputed dummy variable into modelling process")
@@ -133,8 +128,7 @@ y_train = Train["target"].values
 print("####################################y_train##################################")
 
 print(y_train)
-#x_validate = Validate[list(features)].values
-#y_validate = Validate["target"].values
+
 x_test=test[list(features)].values
 
 print("starting random seeeeeed")
@@ -151,16 +145,6 @@ print("Random Forest Function Call done")
 rf.fit(x_train, y_train.astype('str'))
 
 print("Random Seeding fitting done")
-
-#status = rf.predict_proba(x_validate)
-
-# fpr, tpr, _ = roc_curve(y_validate, status[:,1])
-
-# print("before auc")
-# roc_auc = auc(fpr, tpr)
-
-# print ("post AUC")
-# print (roc_auc)
 
 final_status = rf.predict(x_test)
 
